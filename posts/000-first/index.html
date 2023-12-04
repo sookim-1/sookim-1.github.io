@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta property="og:site_name" content="Sookim-1 😁"/><link rel="canonical" href="https://sookim-1.github.io/posts/000-first"/><meta name="twitter:url" content="https://sookim-1.github.io/posts/000-first"/><meta property="og:url" content="https://sookim-1.github.io/posts/000-first"/><title>사용하기 | Sookim-1 😁</title><meta name="twitter:title" content="사용하기 | Sookim-1 😁"/><meta property="og:title" content="사용하기 | Sookim-1 😁"/><meta name="description" content="Tuist"/><meta name="twitter:description" content="Tuist"/><meta property="og:description" content="Tuist"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.svg" type="image/svg+xml"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Sookim-1 😁"/></head><body class="item-page"><script async src="https://platform.twitter.com/widgets.js"></script><script async src="https://b.st-hatena.com/js/bookmark_button.js"></script><header><div class="wrapper"><a href="/" class="site-name">Sookim-1 😁</a></div></header><div class="wrapper"><article><div class="share-buttons"><a href="http://localhost:8000" class="twitter-share-button">트위터</a><a href="https://www.linkedin.com/feed/" class="hatena-bookmark-button" title="링크드인"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABDUlEQVR4AWP4////gOLB44D6nTcsGIo33QHi/zTGd0B2YTiAPpYjHIHNAf/piQk6wGPW8f/rLz8HYRCbXg5AWI4GQGJ0cwDY12gAJDbcHUA4CkZAIqQUK7Ts/m/SfxBMs5RupswBaACr+P47b/5zlG/5DyzZ/r/+8hNF7vuvP//nn3r0X6JhJ+0ccPrR+/+H7735jw9cf/n5v0D1Nuo5gBxQve06zR0AjoL7b7/+//zjN4bc+ScfaOeA33///k9Yfg4mDw7u/Xdeo6uhnQP6D93FMNxlxjF0ZbRzgMXEQ9iyI90cALIMJoccDXRzAK6CZog6YNQBow6gIx54Bwx4x2RAu2bAysoEZu9o7xgAQrvkxt3WZi0AAAAASUVORK5CYII=" alt="링크드인 주소" width="20" height="20" style="border: none;"/></a></div><div class="content"><p>Tuist는 XcodeGen과 더불어 Xcode 프로젝트 파일의 생성및 관리할 수 있는 도구(Command Line Tool) 입니다.</p><p>XcodeGen은 프로젝트 설정을 yml이나 json으로 관리 하는 반면에 Tuist는 Project.swift라는 파일로 관리할 수 있습니다. Project.swift는 스위프트언어로 작성되어 있습니다.</p><p><a href="https://www.notion.so/Raywenderlich-Tuist-81f2114bd8724524a22e8367c23dfdba?pvs=21">Raywenderlich - Tuist 정리</a></p><h1>사용하기</h1><ol><li>Tuist 툴을 설치합니다.<ul><li><code>tuistenv</code> 라고 생성되어도 추후 <code>tuist</code> 로 변경 예정이라고 합니다.</li></ul></li></ol><pre><code class="language-swift">    $ curl -Ls https://install.tuist.io | bash
+    ```
+    
+
+1. 빈 디렉토리를 생성한 후 해당경로로 이동하여 프로젝트 생성합니다.
+    - 프로젝트를 생성하는데 이전의 SPM을 사용한적이 있다면 `Package.swift` 와 `Project.swift` 는동일합니다.
+    
+    ```swift
+    # UIKit
+    $ tuist init --platform ios
+    
+    # SwiftUI
+    $ tuist init --platform ios --template swiftui
+    ```
+    
+
+1. tree 명령어로 파일 구조 확인 가능합니다.
+    
+    ```swift
+    # tree 설치
+    $ brew install tree
+    
+    $ tree .
+    ```
+    
+2. `Project.swift` 수정하는 방법
+    
+    ```swift
+    $ tuist edit
+    ```
+    
+3. 위에서 작성한 Project.swift파일을 기반으로 xcodeproj와 xcworkspace를 생성합니다.
+    
+    ```swift
+    # 기본적으로 의존하는 프로젝트를 모두 생성합니다
+    $ tuist generate
+    
+    # workspace의 특정 프로젝트만 생성하고 싶은 경우 옵션을 사용합니다.
+    $ tuist generate --project-only
+    ```
+    
+4. 외부 Dependency 가져오기 (외부라이브러리)
+    
+    ```swift
+    $ tuist fetch
+    ```
+    
+
+# 참고링크
+
+- Tuist 공식 사이트 - https://tuist.io/
+- Tuist 사용방법 (김종권님의 블로그) - https://ios-development.tistory.com/m/1006
+- Tuist 튜토리얼 (Raywenderlich) - https://www.raywenderlich.com/24508362-tuist-tutorial-for-xcode
+- Tusit 도입기 (Yogiyo) - [https://techblog.yogiyo.co.kr/ios-프로젝트에-tuist-적용기-1d8f7d489252](https://techblog.yogiyo.co.kr/ios-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%97%90-tuist-%EC%A0%81%EC%9A%A9%EA%B8%B0-1d8f7d489252)
+</code></pre></div><span>태그: </span><ul class="tag-list"><li><a href="/tags/notice">notice</a></li></ul></article></div><footer><p>© 2023 Sookim-1</p><p>Generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="https://twitter.com/sookim-1">Twitter</a> | <a href="https://github.com/sookim-1">GitHub</a> | <a href="/feed.rss">RSS</a></p></footer></body></html>
