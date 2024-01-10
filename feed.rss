@@ -1,869 +1,104 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Sookim-1 😁</title><description>iOS개발 블로그</description><link>https://sookim-1.github.io</link><language>ko</language><lastBuildDate>Sun, 7 Jan 2024 23:15:14 +0000</lastBuildDate><pubDate>Sun, 7 Jan 2024 23:15:14 +0000</pubDate><ttl>250</ttl><atom:link href="https://sookim-1.github.io/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://sookim-1.github.io/posts/003-20231205</guid><title>069 2023-12-05</title><description>TBD</description><link>https://sookim-1.github.io/posts/003-20231205</link><pubDate>Tue, 5 Dec 2023 09:00:00 +0000</pubDate><content:encoded><![CDATA[<h1>069 2023-12-05</h1><h2>TBD</h2>]]></content:encoded></item><item><guid isPermaLink="true">https://sookim-1.github.io/posts/004-20231206</guid><title>069 2023-12-05</title><description>TBD</description><link>https://sookim-1.github.io/posts/004-20231206</link><pubDate>Tue, 5 Dec 2023 09:00:00 +0000</pubDate><content:encoded><![CDATA[<h1>069 2023-12-05</h1><h2>TBD</h2>]]></content:encoded></item><item><guid isPermaLink="true">https://sookim-1.github.io/posts/002-20231204</guid><title>002-20231204</title><description>테스트1</description><link>https://sookim-1.github.io/posts/002-20231204</link><pubDate>Mon, 4 Dec 2023 09:00:00 +0000</pubDate><content:encoded><![CDATA[<h3>고민사항</h3><ol><li>서버에서 URL을 전달받아 socket을 연결하려고 했는데 sokcet을 연결하고 관리하는 객체가 싱글톤객체로 구현되어 있어서 어느시점에 서버에서 URL을 전달받는지에 대해서 고민<ul></ul></li></ol><ul><li>socket관리하는 객체 (ConfigSCConnection.swift)<ul></ul></li></ul><pre><code class="language-swift">        // 이 클래스는 서버(SocketCluster)에 대한 연결을 유지하고 모든 유용한 메서드를 선언합니다.
-        final class ConfigSCConnection: PapaNSObject {
-            
-            // 싱글톤 인스턴스의 변수 선언
-            static let shared = ConfigSCConnection()
-            
-            private override init() {}
-            
-            // client가 sockect cluster의 객체입니다. 이 객체의 도움을 받아 sockect cluster에 필요한 모든 작업을 수행할 수 있습니다. sockect cluster가 특정 포트에서 실행되고 있으며 언급된 포트는 모든 연결(공용 포트)에 대해 열려 있어야 합니다.
-            private var client = ScClient(url: Config.generalConfigData["SC_CONNECT_URL"].stringValue)
-            
-            // 구독하고 있는 채널들을 관리하는 배열
-            var listOfSubscribedList = [String]()
-            
-            // 구독하지 않는 채널들을 관리하는 배열
-            var listOfNotSubscribedList = [String]()
-            
-            // 앱과 서버간의 연결을 수행하는 task
-            private var reConnectionFreqTask: UpdateFreqTask!
-            
-            // 소켓 연결안되어있을 때 HTTP통신하는 task
-            private var updateTripStatusFreqTask: UpdateFreqTask!
-            
-            // 5초마다 채널 구독 후 이벤트 수신하는 task
-            private var subscribeTask: UpdateFreqTask!
-            
-            // 채널에 구독하는 중인지 검사하는 변수
-            private var isChannelSubscribing = false
-            
-            private var disposeBag = DisposeBag()
-            
-            
-            // TODO: 소켓 관련 초기 진입점
-            // 해당 메서드는 언급된 서버와 소켓 클러스터의 도움으로 소켓 연결을 만들 것입니다. 이것은 앱의 각 세션에서 한 번씩 호출되어야 합니다.
-            func buildConnection() {
-                log.verbose("소켓 연결 시작")
-                
-                // 연결되어있으면 종료
-                if client.isConnected() {
-                    return
-                }
-                
-                // 백그라운드에서 돌아올 때 노티처리
-                resetDidEnterBackgroundNoti()
-                resetWillResignActiveNoti()
-                
-                // 여정상태 업데이트 주기
-                let serverFetchTripStatusTimeInterval = Config.generalConfigData["FETCH_TRIP_STATUS_TIME_INTERVAL"].stringValue.isEmpty == false ? (Config.generalConfigData["FETCH_TRIP_STATUS_TIME_INTERVAL"].stringValue) : "15"
-                
-                updateTripStatusFreqTask = UpdateFreqTask(interval: Utillity.parseDouble(origValue: 15, data: serverFetchTripStatusTimeInterval), category: .tripStatus)
-                updateTripStatusFreqTask.onTaskRunCalledDelegate = self
-                updateTripStatusFreqTask.startRepeatingTask()
-                
-                // 기본 연결 수신기입니다. 연결 관련 이벤트가 발생하면 이 수신기가 호출됩니다.
-                client.setBasicListener(onConnect: { [weak self] (scClient) in
-                    guard let self = self
-                    else { return }
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Sookim-1 😁</title><description>iOS개발 블로그</description><link>https://sookim-1.github.io</link><language>ko</language><lastBuildDate>Wed, 10 Jan 2024 02:17:52 +0000</lastBuildDate><pubDate>Wed, 10 Jan 2024 02:17:52 +0000</pubDate><ttl>250</ttl><atom:link href="https://sookim-1.github.io/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://sookim-1.github.io/posts/SNS%EB%A1%9C%EA%B7%B8%EC%9D%B8%201%ED%83%84-%EC%B9%B4%EC%B9%B4%EC%98%A4,%20%EB%84%A4%EC%9D%B4%EB%B2%84</guid><title>카카오 로그인</title><description>SNS Login</description><link>https://sookim-1.github.io/posts/SNS%EB%A1%9C%EA%B7%B8%EC%9D%B8%201%ED%83%84-%EC%B9%B4%EC%B9%B4%EC%98%A4,%20%EB%84%A4%EC%9D%B4%EB%B2%84</link><pubDate>Wed, 10 Jan 2024 11:10:00 +0000</pubDate><content:encoded><![CDATA[<p>안녕하세요 sookim입니다~! 깃허브 블로그의 첫 포스팅은 앱의 첫 시작 부분인 SNS로그인에 관하여 작성해보려고 합니다.</p><p>SNS로그인은 다양한 SDK가 있는데 그 중 <code>**카카오**</code>, <code>**네이버**</code>, <code>**페이스북**</code>, <code>**구글**</code>, <code>**깃허브**</code> 로그인등을 구현해보고 애플의 심사지침 중 “앱 내에서 소셜로그인 서비스를 사용한다면 애플로그인을 제공해야 한다.”라는 지침이 있기 때문에 애플로그인도 함께 구현해보겠습니다.</p><h1>카카오 로그인</h1><p>카카오 로그인을 구현하기 위해서 <a href="https://developers.kakao.com/">KakaoDeveloper</a>로 이동하여 카카오계정 로그인을 진행합니다.</p><p><a href="https://developers.kakao.com/docs/latest/ko/ios/getting-started">Kakao SDK for iOS 사용방법</a>을 참고하여 요구사양 확인, <a href="https://developers.kakao.com/docs/latest/ko/getting-started/app#platform">플랫폼등록</a>, SDK 설치를 진행합니다.</p><p>⚠️ 위 단계 진행시 참고할 부분은 3가지 정도가 있습니다.</p><ol><li>카카오디벨로퍼스 앱 설정에서 카카오로그인을 활성화를 진행해야합니다.<ul></ul></li></ol><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/93ced123-cce5-416d-b797-0fa0dab1518e/c46946d7-b2d9-4953-83ed-d0f5d7f1d01e/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-12-12_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_11.29.48.png" alt="스크린샷 2023-12-12 오전 11.29.48.png"/><ol start="2"><li>info.plist의 앱실행허용목록 키값 추가할 때 문서 또는 코드로 작성하는 경우 LSApplicationQueriesSchemes로 키값을 명시하지만 Queried URL Schemes로 키값이 명시됩니다.<ul></ul></li></ol><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/93ced123-cce5-416d-b797-0fa0dab1518e/31babcd3-7cb0-4ef0-b86f-440b86bbc251/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-12-12_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_11.30.30.png" alt="스크린샷 2023-12-12 오전 11.30.30.png"/><ol start="3"><li>카카오SDK 초기화 코드 및 커스텀 스킴에 API Key노출이 되지않도록 주의합니다.<ul></ul></li></ol><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/93ced123-cce5-416d-b797-0fa0dab1518e/2eeda8f5-2fb6-4c1b-9e8b-77a92141a156/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-12-12_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_11.33.07.png" alt="스크린샷 2023-12-12 오전 11.33.07.png"/><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/93ced123-cce5-416d-b797-0fa0dab1518e/196529e3-16bb-42a3-a942-c6f1a6d7cc01/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-12-12_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_11.33.18.png" alt="스크린샷 2023-12-12 오전 11.33.18.png"/><hr><p>위의 SDK 설정작업이 모두 완료되었다면 <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/common">카카오로그인</a>기능을 구현합니다.</p><p>💡 주요 메서드 확인</p><ul><li><strong><code>[isKakaoTalkLoginAvailable()](https://developers.kakao.com/sdk/reference/ios/release/KakaoSDKUser/documentation/kakaosdkuser/userapi/iskakaotalkloginavailable()/)</code> : 카카오톡 간편로그인 실행 가능여부</strong></li><li><strong><code>[loginWithKakaoTalk(launchMethod:channelPublicIds:serviceTerms:nonce:completion:)](https://developers.kakao.com/sdk/reference/ios/release/KakaoSDKUser/documentation/kakaosdkuser/userapi/loginwithkakaotalk(launchmethod:channelpublicids:serviceterms:nonce:completion:)/)</code> : 카카오톡 간편로그인 실행</strong></li><li><code>[**loginWithKakaoAccount()](https://developers.kakao.com/sdk/reference/ios/release/KakaoSDKUser/documentation/kakaosdkuser/userapi/loginwithkakaoaccount(prompts:loginhint:nonce:completion:))</code> : 카카오 웹로그인 실행**<ul><li>iOS 11 이상에서 제공되는 (SF/ASWeb)AuthenticationSession 을 이용하여 로그인 페이지를 띄우고 쿠키 기반 로그인을 수행합니다. 이미 사파리에에서 로그인하여 카카오계정의 쿠키가 있다면 이를 활용하여 ID/PW 입력 없이 간편하게 로그인할 수 있습니다.</li></ul></li></ul><hr><h1>네이버 로그인</h1><p>네이버 로그인을 구현하기 위해서 <a href="https://developers.naver.com/main/">NaverDevelopers</a>로 이동하여 네이버계정 로그인을 진행합니다.</p><p><a href="https://developers.naver.com/products/login/api/api.md">네이버로그인 서비스 소개페이지</a>를 확인한 후 오픈 API이용 신청을 위해 애플리케이션을 등록합니다.</p><ul><li><a href="https://developers.naver.com/docs/common/openapiguide/appregister.md#%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%EB%93%B1%EB%A1%9D">애플리케이션 등록 세부사항</a></li><li>네이버로그인은 검수를 통과해야 모든 사용자가 로그인 할 수 있고 검수를 미진행 상태인 경우에는 멤버관리 탭에서 등록한 계정으로만 로그인이 가능합니다.</li></ul><p><a href="https://developers.naver.com/docs/login/ios/ios.md">iOS용 네이버로그인 라이브러리</a>는 Objective-C언어로 구현이 되어 있어 UIKit에서 사용하는 방법을 단계별로 설명하겠습니다.</p><p>🚨 <a href="https://developers.naver.com/docs/login/ios/ios.md">iOS용 네이버로그인 라이브러리</a>는 Objective-C언어로 구현이 되어 있습니다. 라이브러리 내부의 헤더파일(NaverThirdPartyConstantsForApp.h)에 관련 정보들을 작성해야 하는데 SPM에서 값을 수정할 수 없는 것 같고 SPM을 공식적으로 지원하지 않아 CocoaPod으로 설치를 진행합니다.</p><ol><li>기존의 APIKey관련 값들을 xcconfig파일로 관리하고 있어서 Pod설치를 하여 Pods~.xcconfig에 자동으 로 include하도록 post install 스크립트를 작성한 후 sdk도 함께 설치합니다.<ul><li><a href="https://github.com/sookim-1/iOS_ThirdParty_Projects">SNSLogin프로젝트의 Podfile 참고</a> 2. Build Phase에서 xcconfig파일을 참고하여 자동으로 NaverThirdPartyConstantsForApp.h의 값들을 변경하도록 합니다.</li><li><a href="https://github.com/sookim-1/iOS_ThirdParty_Projects">SNSLogin프로젝트의 Build Phase 참고</a> 3. info.plist의 앱실행허용목록 키값 추가 - LSApplicationQueriesSchemes</li></ul></li></ol><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/93ced123-cce5-416d-b797-0fa0dab1518e/4db43c60-835e-43d1-9d2d-b9e5a73ce0c0/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-12-12_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_5.36.18.png" alt="스크린샷 2023-12-12 오후 5.36.18.png"/><ol start="4"><li>URL Schemes 설정 - 애플리케이션 등록에 설정한 값 (소문자로만 구성하도록 권장)<ul></ul></li></ol><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/93ced123-cce5-416d-b797-0fa0dab1518e/6f3392aa-dfb0-407b-a63c-cbd1b390d05c/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-12-12_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_5.41.22.png" alt="스크린샷 2023-12-12 오후 5.41.22.png"/><ol start="5"><li>AppDelegate.swift에서 각종 관련 설정<ul></ul></li></ol><pre><code class="language-swift">    import NaverThirdPartyLogin
+    
+    @main
+    class AppDelegate: UIResponder, UIApplicationDelegate {
+            func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -&gt; Bool {
                     
-                    // 소켓 연결이 설정되면 호출됩니다.
-                    log.verbose("onConnect")
-                    
-                    self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                    
-                    if UserDefaults.iUserId.isEmpty {
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
+                settingNaverSNSLogin()
+                
+                return true
+            }
+            
+            func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -&gt; Bool {
+                NaverThirdPartyLoginConnection.getSharedInstance().application(app, open: url, options: options)
+                
+                return true
+            }
+            
+            func settingNaverSNSLogin() {
+                // 네이버 앱 간편로그인 활성화
+                NaverThirdPartyLoginConnection.getSharedInstance()?.isNaverAppOauthEnable = true
+                
+                // 네이버 웹 로그인 활성화
+                NaverThirdPartyLoginConnection.getSharedInstance()?.isInAppOauthEnable = true
+                
+                // 네이버 로그인 세로모드 고정
+                NaverThirdPartyLoginConnection.getSharedInstance().setOnlyPortraitSupportInIphone(true)
+                
+                // NaverThirdPartyConstantsForApp.h에 선언한 상수 등록
+                NaverThirdPartyLoginConnection.getSharedInstance().serviceUrlScheme = SNSConfigurations.getValueFor(.naverAppURLScheme)
+                NaverThirdPartyLoginConnection.getSharedInstance().consumerKey = SNSConfigurations.getValueFor(.naverConsumerKey)
+                NaverThirdPartyLoginConnection.getSharedInstance().consumerSecret = SNSConfigurations.getValueFor(.naverConsumerSecret)
+                NaverThirdPartyLoginConnection.getSharedInstance().appName = SNSConfigurations.getValueFor(.naverAppName)
+            }
+    }
+    ```
+    
+6. (SceneDelegate가 구현되어 있다면 설정)
+    
+    ```swift
+    class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+            func scene(_ scene: UIScene, openURLContexts URLContexts: Set&lt;UIOpenURLContext&gt;) {
+                NaverThirdPartyLoginConnection.getSharedInstance()?.receiveAccessToken(URLContexts.first?.url)
+            }
+    }
+    ```
+    
+7. 로그인 동작을 원하는 곳에 NaverThirdPartyLoginConnectionDelegate를 채택한 후 requestThirdPartyLogin()메서드를 실행해줍니다.
+    
+    ```swift
+    import NaverThirdPartyLogin
+    
+    class SNSLoginViewController: UIViewController {
+    
+            let loginInstance = NaverThirdPartyLoginConnection.getSharedInstance()
+    
+            override func viewDidLoad() {
+            super.viewDidLoad()
+    
+                    naverLoginButton.rx.tap.bind { [weak self] in
+                        guard let self
+                        else { return }
                         
-                        return
+                        loginInstance?.delegate = self
+                        loginInstance?.requestThirdPartyLogin()
                     }
-                    
-                    self.subscribeTask = UpdateFreqTask(interval: 5, category: .subscribe)
-                    self.subscribeTask.onTaskRunCalledDelegate = self
-                    self.subscribeTask.startRepeatingTask()
-                    
-                }, onConnectError: { [weak self] (scClient, error) in
-                    guard let self = self else { return }
-                    // 소켓 연결 중 에러가 발생하면 호출됩니다.
-                    log.verbose("onConnectError")
-                    self.reConnectClient()
-                }, onDisconnect: { [weak self] (scClient, error) in
-                    guard let self = self else { return }
-                    log.verbose("onDisconnect")
-                    // 소켓 연결에 실패하면 호출됩니다.
-                    
-                    if UserDefaults.iUserId.isEmpty {
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        
-                        return
-                    }
-                    
-                    self.reConnectClient()
-                })
-                
-                // 소켓 클러스터를 연결하기 위해 호출됩니다.
-                client.connect()
-            }
-            
-            func disconnection() {
-                self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                self.client.disconnect()
-            }
-            
-            private func resetUpdateFreqTask(_ task: inout UpdateFreqTask?) {
-                if task != nil {
-                    task?.stopRepeatingTask()
-                    task = nil
-                }
-            }
-            
-            // 연결 실패/연결 해제 시 소켓 연결을 다시 연결하는 데 사용되는 메서드입니다.
-            private func reConnectClient() {
-                if reConnectionFreqTask != nil {
-                    return
-                }
-                
-                self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                reConnectionFreqTask = UpdateFreqTask(interval: 15, category: .reConnection)
-                reConnectionFreqTask.onTaskRunCalledDelegate = self
-                reConnectionFreqTask.startRepeatingTask()
-            }
-            
-            // 이 메서드는 서버에 연결되어 있지 않기 때문에 채널을 구독하는 데 사용됩니다.
-            private func continueChannelSubscribe() {
-                self.isChannelSubscribing = false
-                
-                // 전부 구독 취소 후 재구독
-                self.releaseAllChannels()
-            
-                self.unSubscribeFromChannels(channelName: "\(Config.passengerChannelName)")
-                self.unSubscribeFromChannels(channelName: "\(Config.passengerChannelName)\(UserDefaults.iUserId)")
-                
-                self.subscribeToChannels(channelName: "\(Config.passengerChannelName)\(UserDefaults.iUserId)")
-                
-                listOfSubscribedList
-                    .filter { $0.isEmpty == false }
-                    .forEach {
-                        self.subscribeToChannels(channelName: $0)
-                    }
-            }
-            
-            // 소켓통신 수신 : 이 메서드는 채널을 구독하는 데 사용됩니다. (Publish-Subscribe module)
-            private func subscribeToChannels(channelName: String) {   // 소캣통신 수신
-                log.verbose("channelName = \(channelName)")
-                
-                if channelName.isEmpty {
-                    return
-                }
-                
-                if UserDefaults.iUserId.isEmpty {
-                    resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                    resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                    resetUpdateFreqTask(&amp;self.subscribeTask)
-                    
-                    return
-                }
-                
-                if channelName.isEmpty == false {
-                    if listOfSubscribedList.contains(channelName) == false {
-                        listOfSubscribedList += [channelName]
-                    }
-                    
-                    if client.isConnected() == false {
-                        return
-                    }
-                    
-                    if isChannelSubscribing == true {
-                        listOfNotSubscribedList += [channelName]
-                        
-                        return
-                    }
-                    
-                    isChannelSubscribing = true
-                    
-                    // 승인을 받아 새채널을 구독하는 데 사용되는 함수입니다.
-                    client.subscribeAck(channelName: channelName, ack: {
-                        [weak self] (channelName: String, error: AnyObject?, data: AnyObject?) in
-                        guard let self = self else { return }
-                        
-                        self.isChannelSubscribing = false
-                        
-                        if (error is NSNull) == false {
-                            log.verbose("소켓 통신 에러 발생 : \(String(describing: error))")
-                        } else {
-                            // 특정 채널 구독에 성공하면 해당 채널에서 청취를 시작합니다.
-                            self.client.onChannel(channelName: channelName, ack: { (channelName: String, data: AnyObject?) in
-                                // 이벤트 알림이 도착하면 데이터를 처리합니다.
-                                let datas = JSON(data as Any)
-                                let bodyStrig = datas.stringValue
-                                let realBody = JSON(bodyStrig.getJsonDataDict())
-                                log.verbose("소켓 통신 응답값 : \(channelName) :: \(datas)")
-                                
-                                // PQ-1808 예약여정시 메인에서 받지 않는 경우
-                                if realBody["Message"].stringValue == TripStatusActive.cabRequestAccepted.rawValue ||
-                                    realBody["MsgType"].stringValue == TripStatusActive.cabRequestAccepted.rawValue {
-                                    
-                                    if Config.mainLoadCheck == false {
-                                        NotificationCenter.default.post(name: .reserveTripNoti, object: nil)
-                                        return
-                                    }
-                                } else if (realBody["Message"].stringValue == TripStatusActive.reservedConfirm.rawValue) {
-                                    
-                                    self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                    NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                    return
-                                } else if (realBody["Message"].stringValue == TripStatusActive.reservedFailed.rawValue) {
-                                    
-                                    self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                    NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                    return
-                                } else if (realBody["Message"].stringValue == TripStatusActive.tripCancelledByDriver.rawValue) {
-                                    // 예약 확정 후 취소하는 경우 TripCancelledByDriver로 내려와서 메인화면 아닌 경우 처리
-                                    if Config.mainLoadCheck == false {
-                                        
-                                        self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                        
-                                        NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                        
-                                        return
-                                    }
-                                }
-                                
-                                NotificationCenter.default.post(name: .updateTripStatusNoti, object: realBody)
-                            })
-                            
-                            if self.listOfNotSubscribedList.isEmpty == false {
-                                let newChannel = self.listOfNotSubscribedList[0]
-                                self.listOfNotSubscribedList.remove(at: 0)
-                                
-                                if newChannel.isEmpty == false {
-                                    self.subscribeToChannels(channelName: newChannel)
-                                }
-                            }
-                        }
-                    })
-                }
-            }
-            
-            // 특정 채널에서 사용자구독을 취소하는 데 사용되는 메서드입니다.
-            private func unSubscribeFromChannels(channelName: String) {
-                if channelName.isEmpty == false {
-                    if listOfSubscribedList.contains(channelName) {
-                        client.unsubscribeAck(channelName: channelName, ack: { [weak self] (channelName, error, data) in
-                            guard let self = self else { return }
-                            
-                            if (error is NSNull) == false {
-                                log.error("구독 취소 중 에러 발생")
-                            } else {
-                                if let index = self.listOfSubscribedList.firstIndex(of: channelName) {
-                                    self.listOfSubscribedList.remove(at: index)
-                                }
-                            }
-                        })
-                    }
-                }
-            }
-            
-            // 모든 채널 구독을 취소하는 데 사용되는 기능입니다. 일반적으로 이 작업은 앱이 종료될 때 수행됩니다.
-            private func releaseAllChannels() {
-                listOfSubscribedList.forEach {
-                    unSubscribeFromChannels(channelName: $0)
-                }
-            }
-            
-            private func resetDidEnterBackgroundNoti() {
-                NotificationCenter
-                    .default
-                    .rx
-                    .notification(.applicationDidBackgroundNoti)
-                    .subscribe(onNext: { [weak self] (aNotification) in
-                        guard let self = self else { return }
-                        
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        self.client.disconnect()
-                    })
                     .disposed(by: disposeBag)
             }
-            
-            private func resetWillResignActiveNoti() {
-                NotificationCenter
-                    .default
-                    .rx
-                    .notification(.applicationWillResignActiveNoti)
-                    .subscribe(onNext: { [weak self] (aNotification) in
-                        guard let self = self else { return }
-                        
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        self.client.disconnect()
-                    })
-                    .disposed(by: disposeBag)
-            }
-            
-            
-            // 연결 안되어있을 때 HTTP 요청
-            // TODO: configPassengerTripStatus API message 키 값 타입이 정확히 오지 않아서 소켓 대비에서만 JSON처리
-            private func requestConfigPassengerTripStatus() {
-                if PlanConfig.currentLocation != nil {
-                    Connection.configPassengerTripStatusJSON(vLatitude: "\(PlanConfig.currentLocation.coordinate.latitude)", vLongitude: "\(PlanConfig.currentLocation.coordinate.longitude)") { [weak self] (returnDatas, status) in
-                        guard let self = self else { return }
-                        
-                        if status {
-                            let dataDict = JSON(returnDatas as Any)
-                            log.verbose("dataDict : \(dataDict)")
-                            PlanConfig.vTripCancelConfirmMessage = dataDict["vTripCancelConfirmMessage"].stringValue
-                            PlanConfig.vTripCancelDispatchTimeMessage = dataDict["vTripCancelDispatchTimeMessage"].stringValue
-                            PlanConfig.vTripCancelFeesMessageConfirm = dataDict["vTripCancelFeesMessageConfirm"].stringValue
-                            PlanConfig.vTripCancelFeesMessage = dataDict["vTripCancelFeesMessage"].stringValue
-                            
-                            let currentDrivers = dataDict["currentDrivers"].arrayValue
-                            
-                            if currentDrivers.isEmpty == false {
-                                currentDrivers.forEach { value in
-                                    let rowData = JSON(value)
-                                    
-                                    if PlanConfig.joinDriverId == rowData["iDriverId"].stringValue {
-                                        PlanConfig.joinDriverLocation = CLLocation(latitude: rowData["vLatitude"].doubleValue, longitude: rowData["vLongitude"].doubleValue)
-                                    }
-                                    
-                                    let bodyStrig = dataDict["message"].stringValue
-                                    let realBody = JSON(bodyStrig.getJsonDataDict())
-                                    log.verbose("configPassengerTripStatus 확인하기A :: \(realBody)")
-                                    
-                                    // PQ-1808 예약여정시 메인에서 받지 않는 경우
-                                    if realBody["Message"].stringValue == TripStatusActive.cabRequestAccepted.rawValue ||
-                                        realBody["MsgType"].stringValue == TripStatusActive.cabRequestAccepted.rawValue {
-                                        
-                                        if Config.mainLoadCheck == false {
-                                            NotificationCenter.default.post(name: .reserveTripNoti, object: nil)
-                                            return
-                                        }
-                                    } else if (realBody["Message"].stringValue == TripStatusActive.reservedConfirm.rawValue) {
-                                        
-                                        self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                        NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                        return
-                                    } else if (realBody["Message"].stringValue == TripStatusActive.reservedFailed.rawValue) {
-                                        
-                                        self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                        NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                        return
-                                    } else if (realBody["Message"].stringValue == TripStatusActive.tripCancelledByDriver.rawValue) {
-                                        // 예약 확정 후 취소하는 경우 TripCancelledByDriver로 내려와서 메인화면 아닌 경우 처리
-                                        if Config.mainLoadCheck == false {
-                                            
-                                            self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                            
-                                            NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                            
-                                            return
-                                        }
-                                    }
-                                    
-                                    NotificationCenter.default.post(name: .updateTripStatusNoti, object: realBody)
-                                }
-                            }
-                        } else {
-                            let dataDict = JSON(returnDatas as Any)
-                            
-                            if dataDict["message"].stringValue == "SESSION_OUT" {
-                                log.verbose("SESSION_OUT_CALLED")
-                                return
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // 예약 확정, 취소 알림용 메서드
-            private func openCommonPopup(message: String) {
-                let mainStoryboard: UIStoryboard = UIStoryboard(name: "CommonPopupViewController", bundle: nil)
-                let nextView = mainStoryboard.instantiateViewController(withIdentifier: "CommonPopupView") as! CommonPopupViewController
-                let topView = Utillity.topViewController()
-                
-                if Utillity.isTypeViewController(type: CommonPopupViewController.self) {
-                    topView?.dismiss(animated: true) {
-                        let nextTopView = Utillity.topViewController()
-                        nextView.titleString = "알림"
-                        nextView.messageString = message
-                        nextView.doneBtnString = "확인"
-                        
-                        nextTopView?.present(nextView, animated: false)
-                    }
-                } else {
-                    let nextTopView = Utillity.topViewController()
-                    nextView.titleString = "알림"
-                    nextView.messageString = message
-                    nextView.doneBtnString = "확인"
-                    
-                    nextTopView?.present(nextView, animated: false)
-                }
-            }
-            
-        }
-        ```
+    }
+    
+    extension SNSLoginViewController: NaverThirdPartyLoginConnectionDelegate {
         
-    
-    → 현재는 서버에 URL요청하는 API호출을 Launch화면에서 호출하는데 항상 싱글톤인스턴스생성시점보다 먼저 호출이 되는 것인가?
-    
-    일단 기본적으로 Swift에서 전역변수들은 모두 lazy가 기본적으로 적용된 상태이므로 lazy를 사용해도 똑같습니다다. 즉, 싱글톤 객체는 사용되는 시점에 메모리에 할당됩니다.
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://sookim-1.github.io/posts/001-20231203</guid><title>001-20231203</title><description>테스트</description><link>https://sookim-1.github.io/posts/001-20231203</link><pubDate>Sun, 3 Dec 2023 09:00:00 +0000</pubDate><content:encoded><![CDATA[<h3>고민사항</h3><ol><li>서버에서 URL을 전달받아 socket을 연결하려고 했는데 sokcet을 연결하고 관리하는 객체가 싱글톤객체로 구현되어 있어서 어느시점에 서버에서 URL을 전달받는지에 대해서 고민<ul></ul></li></ol><ul><li>socket관리하는 객체 (ConfigSCConnection.swift)<ul></ul></li></ul><pre><code class="language-swift">        // 이 클래스는 서버(SocketCluster)에 대한 연결을 유지하고 모든 유용한 메서드를 선언합니다.
-        final class ConfigSCConnection: PapaNSObject {
-            
-            // 싱글톤 인스턴스의 변수 선언
-            static let shared = ConfigSCConnection()
-            
-            private override init() {}
-            
-            // client가 sockect cluster의 객체입니다. 이 객체의 도움을 받아 sockect cluster에 필요한 모든 작업을 수행할 수 있습니다. sockect cluster가 특정 포트에서 실행되고 있으며 언급된 포트는 모든 연결(공용 포트)에 대해 열려 있어야 합니다.
-            private var client = ScClient(url: Config.generalConfigData["SC_CONNECT_URL"].stringValue)
-            
-            // 구독하고 있는 채널들을 관리하는 배열
-            var listOfSubscribedList = [String]()
-            
-            // 구독하지 않는 채널들을 관리하는 배열
-            var listOfNotSubscribedList = [String]()
-            
-            // 앱과 서버간의 연결을 수행하는 task
-            private var reConnectionFreqTask: UpdateFreqTask!
-            
-            // 소켓 연결안되어있을 때 HTTP통신하는 task
-            private var updateTripStatusFreqTask: UpdateFreqTask!
-            
-            // 5초마다 채널 구독 후 이벤트 수신하는 task
-            private var subscribeTask: UpdateFreqTask!
-            
-            // 채널에 구독하는 중인지 검사하는 변수
-            private var isChannelSubscribing = false
-            
-            private var disposeBag = DisposeBag()
-            
-            
-            // TODO: 소켓 관련 초기 진입점
-            // 해당 메서드는 언급된 서버와 소켓 클러스터의 도움으로 소켓 연결을 만들 것입니다. 이것은 앱의 각 세션에서 한 번씩 호출되어야 합니다.
-            func buildConnection() {
-                log.verbose("소켓 연결 시작")
-                
-                // 연결되어있으면 종료
-                if client.isConnected() {
-                    return
-                }
-                
-                // 백그라운드에서 돌아올 때 노티처리
-                resetDidEnterBackgroundNoti()
-                resetWillResignActiveNoti()
-                
-                // 여정상태 업데이트 주기
-                let serverFetchTripStatusTimeInterval = Config.generalConfigData["FETCH_TRIP_STATUS_TIME_INTERVAL"].stringValue.isEmpty == false ? (Config.generalConfigData["FETCH_TRIP_STATUS_TIME_INTERVAL"].stringValue) : "15"
-                
-                updateTripStatusFreqTask = UpdateFreqTask(interval: Utillity.parseDouble(origValue: 15, data: serverFetchTripStatusTimeInterval), category: .tripStatus)
-                updateTripStatusFreqTask.onTaskRunCalledDelegate = self
-                updateTripStatusFreqTask.startRepeatingTask()
-                
-                // 기본 연결 수신기입니다. 연결 관련 이벤트가 발생하면 이 수신기가 호출됩니다.
-                client.setBasicListener(onConnect: { [weak self] (scClient) in
-                    guard let self = self
-                    else { return }
-                    
-                    // 소켓 연결이 설정되면 호출됩니다.
-                    log.verbose("onConnect")
-                    
-                    self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                    
-                    if UserDefaults.iUserId.isEmpty {
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        
-                        return
-                    }
-                    
-                    self.subscribeTask = UpdateFreqTask(interval: 5, category: .subscribe)
-                    self.subscribeTask.onTaskRunCalledDelegate = self
-                    self.subscribeTask.startRepeatingTask()
-                    
-                }, onConnectError: { [weak self] (scClient, error) in
-                    guard let self = self else { return }
-                    // 소켓 연결 중 에러가 발생하면 호출됩니다.
-                    log.verbose("onConnectError")
-                    self.reConnectClient()
-                }, onDisconnect: { [weak self] (scClient, error) in
-                    guard let self = self else { return }
-                    log.verbose("onDisconnect")
-                    // 소켓 연결에 실패하면 호출됩니다.
-                    
-                    if UserDefaults.iUserId.isEmpty {
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        
-                        return
-                    }
-                    
-                    self.reConnectClient()
-                })
-                
-                // 소켓 클러스터를 연결하기 위해 호출됩니다.
-                client.connect()
-            }
-            
-            func disconnection() {
-                self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                self.client.disconnect()
-            }
-            
-            private func resetUpdateFreqTask(_ task: inout UpdateFreqTask?) {
-                if task != nil {
-                    task?.stopRepeatingTask()
-                    task = nil
-                }
-            }
-            
-            // 연결 실패/연결 해제 시 소켓 연결을 다시 연결하는 데 사용되는 메서드입니다.
-            private func reConnectClient() {
-                if reConnectionFreqTask != nil {
-                    return
-                }
-                
-                self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                reConnectionFreqTask = UpdateFreqTask(interval: 15, category: .reConnection)
-                reConnectionFreqTask.onTaskRunCalledDelegate = self
-                reConnectionFreqTask.startRepeatingTask()
-            }
-            
-            // 이 메서드는 서버에 연결되어 있지 않기 때문에 채널을 구독하는 데 사용됩니다.
-            private func continueChannelSubscribe() {
-                self.isChannelSubscribing = false
-                
-                // 전부 구독 취소 후 재구독
-                self.releaseAllChannels()
-            
-                self.unSubscribeFromChannels(channelName: "\(Config.passengerChannelName)")
-                self.unSubscribeFromChannels(channelName: "\(Config.passengerChannelName)\(UserDefaults.iUserId)")
-                
-                self.subscribeToChannels(channelName: "\(Config.passengerChannelName)\(UserDefaults.iUserId)")
-                
-                listOfSubscribedList
-                    .filter { $0.isEmpty == false }
-                    .forEach {
-                        self.subscribeToChannels(channelName: $0)
-                    }
-            }
-            
-            // 소켓통신 수신 : 이 메서드는 채널을 구독하는 데 사용됩니다. (Publish-Subscribe module)
-            private func subscribeToChannels(channelName: String) {   // 소캣통신 수신
-                log.verbose("channelName = \(channelName)")
-                
-                if channelName.isEmpty {
-                    return
-                }
-                
-                if UserDefaults.iUserId.isEmpty {
-                    resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                    resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                    resetUpdateFreqTask(&amp;self.subscribeTask)
-                    
-                    return
-                }
-                
-                if channelName.isEmpty == false {
-                    if listOfSubscribedList.contains(channelName) == false {
-                        listOfSubscribedList += [channelName]
-                    }
-                    
-                    if client.isConnected() == false {
-                        return
-                    }
-                    
-                    if isChannelSubscribing == true {
-                        listOfNotSubscribedList += [channelName]
-                        
-                        return
-                    }
-                    
-                    isChannelSubscribing = true
-                    
-                    // 승인을 받아 새채널을 구독하는 데 사용되는 함수입니다.
-                    client.subscribeAck(channelName: channelName, ack: {
-                        [weak self] (channelName: String, error: AnyObject?, data: AnyObject?) in
-                        guard let self = self else { return }
-                        
-                        self.isChannelSubscribing = false
-                        
-                        if (error is NSNull) == false {
-                            log.verbose("소켓 통신 에러 발생 : \(String(describing: error))")
-                        } else {
-                            // 특정 채널 구독에 성공하면 해당 채널에서 청취를 시작합니다.
-                            self.client.onChannel(channelName: channelName, ack: { (channelName: String, data: AnyObject?) in
-                                // 이벤트 알림이 도착하면 데이터를 처리합니다.
-                                let datas = JSON(data as Any)
-                                let bodyStrig = datas.stringValue
-                                let realBody = JSON(bodyStrig.getJsonDataDict())
-                                log.verbose("소켓 통신 응답값 : \(channelName) :: \(datas)")
-                                
-                                // PQ-1808 예약여정시 메인에서 받지 않는 경우
-                                if realBody["Message"].stringValue == TripStatusActive.cabRequestAccepted.rawValue ||
-                                    realBody["MsgType"].stringValue == TripStatusActive.cabRequestAccepted.rawValue {
-                                    
-                                    if Config.mainLoadCheck == false {
-                                        NotificationCenter.default.post(name: .reserveTripNoti, object: nil)
-                                        return
-                                    }
-                                } else if (realBody["Message"].stringValue == TripStatusActive.reservedConfirm.rawValue) {
-                                    
-                                    self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                    NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                    return
-                                } else if (realBody["Message"].stringValue == TripStatusActive.reservedFailed.rawValue) {
-                                    
-                                    self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                    NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                    return
-                                } else if (realBody["Message"].stringValue == TripStatusActive.tripCancelledByDriver.rawValue) {
-                                    // 예약 확정 후 취소하는 경우 TripCancelledByDriver로 내려와서 메인화면 아닌 경우 처리
-                                    if Config.mainLoadCheck == false {
-                                        
-                                        self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                        
-                                        NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                        
-                                        return
-                                    }
-                                }
-                                
-                                NotificationCenter.default.post(name: .updateTripStatusNoti, object: realBody)
-                            })
-                            
-                            if self.listOfNotSubscribedList.isEmpty == false {
-                                let newChannel = self.listOfNotSubscribedList[0]
-                                self.listOfNotSubscribedList.remove(at: 0)
-                                
-                                if newChannel.isEmpty == false {
-                                    self.subscribeToChannels(channelName: newChannel)
-                                }
-                            }
-                        }
-                    })
-                }
-            }
-            
-            // 특정 채널에서 사용자구독을 취소하는 데 사용되는 메서드입니다.
-            private func unSubscribeFromChannels(channelName: String) {
-                if channelName.isEmpty == false {
-                    if listOfSubscribedList.contains(channelName) {
-                        client.unsubscribeAck(channelName: channelName, ack: { [weak self] (channelName, error, data) in
-                            guard let self = self else { return }
-                            
-                            if (error is NSNull) == false {
-                                log.error("구독 취소 중 에러 발생")
-                            } else {
-                                if let index = self.listOfSubscribedList.firstIndex(of: channelName) {
-                                    self.listOfSubscribedList.remove(at: index)
-                                }
-                            }
-                        })
-                    }
-                }
-            }
-            
-            // 모든 채널 구독을 취소하는 데 사용되는 기능입니다. 일반적으로 이 작업은 앱이 종료될 때 수행됩니다.
-            private func releaseAllChannels() {
-                listOfSubscribedList.forEach {
-                    unSubscribeFromChannels(channelName: $0)
-                }
-            }
-            
-            private func resetDidEnterBackgroundNoti() {
-                NotificationCenter
-                    .default
-                    .rx
-                    .notification(.applicationDidBackgroundNoti)
-                    .subscribe(onNext: { [weak self] (aNotification) in
-                        guard let self = self else { return }
-                        
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        self.client.disconnect()
-                    })
-                    .disposed(by: disposeBag)
-            }
-            
-            private func resetWillResignActiveNoti() {
-                NotificationCenter
-                    .default
-                    .rx
-                    .notification(.applicationWillResignActiveNoti)
-                    .subscribe(onNext: { [weak self] (aNotification) in
-                        guard let self = self else { return }
-                        
-                        self.resetUpdateFreqTask(&amp;self.reConnectionFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.updateTripStatusFreqTask)
-                        self.resetUpdateFreqTask(&amp;self.subscribeTask)
-                        self.client.disconnect()
-                    })
-                    .disposed(by: disposeBag)
-            }
-            
-            
-            // 연결 안되어있을 때 HTTP 요청
-            // TODO: configPassengerTripStatus API message 키 값 타입이 정확히 오지 않아서 소켓 대비에서만 JSON처리
-            private func requestConfigPassengerTripStatus() {
-                if PlanConfig.currentLocation != nil {
-                    Connection.configPassengerTripStatusJSON(vLatitude: "\(PlanConfig.currentLocation.coordinate.latitude)", vLongitude: "\(PlanConfig.currentLocation.coordinate.longitude)") { [weak self] (returnDatas, status) in
-                        guard let self = self else { return }
-                        
-                        if status {
-                            let dataDict = JSON(returnDatas as Any)
-                            log.verbose("dataDict : \(dataDict)")
-                            PlanConfig.vTripCancelConfirmMessage = dataDict["vTripCancelConfirmMessage"].stringValue
-                            PlanConfig.vTripCancelDispatchTimeMessage = dataDict["vTripCancelDispatchTimeMessage"].stringValue
-                            PlanConfig.vTripCancelFeesMessageConfirm = dataDict["vTripCancelFeesMessageConfirm"].stringValue
-                            PlanConfig.vTripCancelFeesMessage = dataDict["vTripCancelFeesMessage"].stringValue
-                            
-                            let currentDrivers = dataDict["currentDrivers"].arrayValue
-                            
-                            if currentDrivers.isEmpty == false {
-                                currentDrivers.forEach { value in
-                                    let rowData = JSON(value)
-                                    
-                                    if PlanConfig.joinDriverId == rowData["iDriverId"].stringValue {
-                                        PlanConfig.joinDriverLocation = CLLocation(latitude: rowData["vLatitude"].doubleValue, longitude: rowData["vLongitude"].doubleValue)
-                                    }
-                                    
-                                    let bodyStrig = dataDict["message"].stringValue
-                                    let realBody = JSON(bodyStrig.getJsonDataDict())
-                                    log.verbose("configPassengerTripStatus 확인하기A :: \(realBody)")
-                                    
-                                    // PQ-1808 예약여정시 메인에서 받지 않는 경우
-                                    if realBody["Message"].stringValue == TripStatusActive.cabRequestAccepted.rawValue ||
-                                        realBody["MsgType"].stringValue == TripStatusActive.cabRequestAccepted.rawValue {
-                                        
-                                        if Config.mainLoadCheck == false {
-                                            NotificationCenter.default.post(name: .reserveTripNoti, object: nil)
-                                            return
-                                        }
-                                    } else if (realBody["Message"].stringValue == TripStatusActive.reservedConfirm.rawValue) {
-                                        
-                                        self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                        NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                        return
-                                    } else if (realBody["Message"].stringValue == TripStatusActive.reservedFailed.rawValue) {
-                                        
-                                        self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                        NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                        return
-                                    } else if (realBody["Message"].stringValue == TripStatusActive.tripCancelledByDriver.rawValue) {
-                                        // 예약 확정 후 취소하는 경우 TripCancelledByDriver로 내려와서 메인화면 아닌 경우 처리
-                                        if Config.mainLoadCheck == false {
-                                            
-                                            self.openCommonPopup(message: realBody["vTitle"].stringValue)
-                                            
-                                            NotificationCenter.default.post(name: .resetTripListNoti, object: nil, userInfo: ["isRedDot": true])
-                                            
-                                            return
-                                        }
-                                    }
-                                    
-                                    NotificationCenter.default.post(name: .updateTripStatusNoti, object: realBody)
-                                }
-                            }
-                        } else {
-                            let dataDict = JSON(returnDatas as Any)
-                            
-                            if dataDict["message"].stringValue == "SESSION_OUT" {
-                                log.verbose("SESSION_OUT_CALLED")
-                                return
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // 예약 확정, 취소 알림용 메서드
-            private func openCommonPopup(message: String) {
-                let mainStoryboard: UIStoryboard = UIStoryboard(name: "CommonPopupViewController", bundle: nil)
-                let nextView = mainStoryboard.instantiateViewController(withIdentifier: "CommonPopupView") as! CommonPopupViewController
-                let topView = Utillity.topViewController()
-                
-                if Utillity.isTypeViewController(type: CommonPopupViewController.self) {
-                    topView?.dismiss(animated: true) {
-                        let nextTopView = Utillity.topViewController()
-                        nextView.titleString = "알림"
-                        nextView.messageString = message
-                        nextView.doneBtnString = "확인"
-                        
-                        nextTopView?.present(nextView, animated: false)
-                    }
-                } else {
-                    let nextTopView = Utillity.topViewController()
-                    nextView.titleString = "알림"
-                    nextView.messageString = message
-                    nextView.doneBtnString = "확인"
-                    
-                    nextTopView?.present(nextView, animated: false)
-                }
-            }
-            
+        // 로그인 버튼을 눌렀을 경우 열게 될 브라우저
+        func oauth20ConnectionDidOpenInAppBrowser(forOAuth request: URLRequest!) {
+            print("open")
         }
-        ```
         
-    
-    → 현재는 서버에 URL요청하는 API호출을 Launch화면에서 호출하는데 항상 싱글톤인스턴스생성시점보다 먼저 호출이 되는 것인가?
-    
-    일단 기본적으로 Swift에서 전역변수들은 모두 lazy가 기본적으로 적용된 상태이므로 lazy를 사용해도 똑같습니다다. 즉, 싱글톤 객체는 사용되는 시점에 메모리에 할당됩니다.
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://sookim-1.github.io/posts/000-first</guid><title>사용하기</title><description>Tuist</description><link>https://sookim-1.github.io/posts/000-first</link><pubDate>Sat, 2 Dec 2023 09:00:00 +0000</pubDate><content:encoded><![CDATA[<p>Tuist는 XcodeGen과 더불어 Xcode 프로젝트 파일의 생성및 관리할 수 있는 도구(Command Line Tool) 입니다.</p><p>XcodeGen은 프로젝트 설정을 yml이나 json으로 관리 하는 반면에 Tuist는 Project.swift라는 파일로 관리할 수 있습니다. Project.swift는 스위프트언어로 작성되어 있습니다.</p><p><a href="https://www.notion.so/Raywenderlich-Tuist-81f2114bd8724524a22e8367c23dfdba?pvs=21">Raywenderlich - Tuist 정리</a></p><h1>사용하기</h1><ol><li>Tuist 툴을 설치합니다.<ul><li><code>tuistenv</code> 라고 생성되어도 추후 <code>tuist</code> 로 변경 예정이라고 합니다.</li></ul></li></ol><pre><code class="language-swift">    $ curl -Ls https://install.tuist.io | bash
+        // 로그인에 성공했을 경우 호출
+        func oauth20ConnectionDidFinishRequestACTokenWithAuthCode() {
+            print("[Success] : Success Naver Login")
+            
+            self.pushToSuccessViewController(successText: "네이버로그인 성공")
+        }
+        
+        // 접근 토큰 갱신
+        func oauth20ConnectionDidFinishRequestACTokenWithRefreshToken() {
+            print("token refresh")
+        }
+        
+        // 로그아웃 할 경우 호출(토큰 삭제)
+        func oauth20ConnectionDidFinishDeleteToken() {
+            loginInstance?.requestDeleteToken()
+        }
+        
+        // 모든 Error
+        func oauth20Connection(_ oauthConnection: NaverThirdPartyLoginConnection!, didFailWithError error: Error!) {
+            print("[Error] :", error.localizedDescription)
+        }
+        
+    }
     ```
     
 
-1. 빈 디렉토리를 생성한 후 해당경로로 이동하여 프로젝트 생성합니다.
-    - 프로젝트를 생성하는데 이전의 SPM을 사용한적이 있다면 `Package.swift` 와 `Project.swift` 는동일합니다.
-    
-    ```swift
-    # UIKit
-    $ tuist init --platform ios
-    
-    # SwiftUI
-    $ tuist init --platform ios --template swiftui
-    ```
-    
-
-1. tree 명령어로 파일 구조 확인 가능합니다.
-    
-    ```swift
-    # tree 설치
-    $ brew install tree
-    
-    $ tree .
-    ```
-    
-2. `Project.swift` 수정하는 방법
-    
-    ```swift
-    $ tuist edit
-    ```
-    
-3. 위에서 작성한 Project.swift파일을 기반으로 xcodeproj와 xcworkspace를 생성합니다.
-    
-    ```swift
-    # 기본적으로 의존하는 프로젝트를 모두 생성합니다
-    $ tuist generate
-    
-    # workspace의 특정 프로젝트만 생성하고 싶은 경우 옵션을 사용합니다.
-    $ tuist generate --project-only
-    ```
-    
-4. 외부 Dependency 가져오기 (외부라이브러리)
-    
-    ```swift
-    $ tuist fetch
-    ```
-    
-
-# 참고링크
-
-- Tuist 공식 사이트 - https://tuist.io/
-- Tuist 사용방법 (김종권님의 블로그) - https://ios-development.tistory.com/m/1006
-- Tuist 튜토리얼 (Raywenderlich) - https://www.raywenderlich.com/24508362-tuist-tutorial-for-xcode
-- Tusit 도입기 (Yogiyo) - [https://techblog.yogiyo.co.kr/ios-프로젝트에-tuist-적용기-1d8f7d489252](https://techblog.yogiyo.co.kr/ios-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%97%90-tuist-%EC%A0%81%EC%9A%A9%EA%B8%B0-1d8f7d489252)
+---
 </code></pre>]]></content:encoded></item></channel></rss>
