@@ -1,0 +1,30 @@
+<!doctype html><html lang="en" data-bs-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="🔗 Ignite is a library that helps Swift developers create static websites."><meta name="author" content="sookim-1"><meta name="generator" content="Ignite v0.1.0"><title>Number: 034, Date: 2024-09-30 – My T.W.L Site</title><link href="/css/bootstrap.min.css" rel="stylesheet"><link href="/css/bootstrap-icons.min.css" rel="stylesheet"><link href="https://sookim-1.github.io/en/034-20240930_en" rel="canonical"><link href="/images/favicon.png" rel="icon"><meta property="og:site_name" content="sookim-1"><meta property="og:title" content="Number: 034, Date: 2024-09-30"><meta property="twitter:title" content="Number: 034, Date: 2024-09-30"><meta property="og:description" content="Number: 034, Date: 2024-09-30"><meta name="twitter:description" content="Number: 034, Date: 2024-09-30"><meta property="og:url" content="https://sookim-1.github.io/en/034-20240930_en"><meta name="twitter:domain" content="sookim-1.github.io"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:dnt" content="on"></head><body class="container"style="padding-top: 80px; padding-bottom: 80px"><div class="col-sm-10 mx-auto"><h1>Number: 034, Date: 2024-09-30</h1><p><h2>2024.09.19 ~ 2024.09.29</h2><h3>🌎 Ignite</h3><hr /><p>🔗 <a href="https://github.com/twostraws/Ignite">Ignite</a> is a library that helps Swift developers create static websites.</p><p>I have been managing my weekly retrospective blog using a similar library called 🔗 <a href="https://github.com/JohnSundell/Publish">Publish</a>.</p><p>However, while Publish requires knowledge of HTML and CSS for customizations, Ignite is much more intuitive and simple, using SwiftUI-like syntax, which led me to switch.</p><p>Ignite is easy to use. After installing the CLI, you can implement the UI by combining the provided components, referencing the 🔗 <a href="https://ignitesamples.hackingwithswift.com/">Sample Site</a>.</p><p>When you build the package, a Build folder is created. By deploying the files inside that folder, a static website is complete.</p><p>I created a separate repository to manage the source code, then implemented a GitHub action to transfer the files from the Build folder to my <a href="http://github.io">github.io</a> repository.</p><p>Ignite provides a component called ContentPreview, but it’s not customizable. I modified the open source to accept a closure for customization, but after a PR review, I was advised to pass it to the modifier and revised the implementation accordingly.</p><ul><li>🔗 <a href="https://github.com/twostraws/Ignite/pull/129">Pull Request</a></li></ul><h3>🔐 Managing Multiple GitHub Accounts with Tokens</h3><hr /><p>🔗 <a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-personal-account/managing-multiple-accounts">GitHub Docs - Managing Multiple Accounts</a></p><p>To manage multiple GitHub accounts on a single device, some additional steps are required when using the HTTPS method.</p><p>While using GitHub tokens for each repository can solve the issue by authenticating at the repository level instead of the account level, it results in multiple entries in the keychain and requires authentication for each repository, which can be inconvenient. Using SSH seems to be a better approach.</p><blockquote><p>Managing Multiple Accounts with HTTPS</p></blockquote><pre><code class="language-bash">$ git config --get credential.helper
+
+# Enter
+$ git credential-osxkeychain erase
+host=github.com
+protocol=https
+
+$ git config --global credential.https://github.com.useHttpPath true
+</code></pre><blockquote><p>Managing Multiple Accounts with SSH</p></blockquote><pre><code class="language-bash"># Generate SSH keys for each account
+$ ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# Create SSH config file
+$ ~/.ssh/config
+
+#######
+Host github-personal
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_personal
+
+Host github-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_work
+#######
+
+# Use different hostnames for each repository when cloning
+git clone git@github-personal:username/repo.git
+git clone git@github-work:username/repo.git
+</code></pre><h3>🙋🏻‍♂️ Miscellaneous</h3><hr /><ol><li>After upgrading to macOS Sequoia 15 and Xcode 16, there is an issue where HandyJSON fails to build. There is a branch that fixes this issue, and adding that branch to SwiftPM resolves it.</li><li>Code completion in Xcode 16 has been enhanced. To apply the suggested code, click the Tab button.</li><li>I received a rejection regarding the Facebook Login SDK. As usual with Facebook, it seems that submitting multiple times is necessary to get a detailed reason for the rejection.</li></ol></p><div><h3><a href="/tags/i-o-s" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">iOS</span></a><a href="/tags/swift" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">Swift</span></a><a href="/tags/xcode" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">Xcode</span></a><a href="/tags/h-t-t-p-s" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">HTTPS</span></a><a href="/tags/ignite" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">Ignite</span></a><a href="/tags/blog" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">Blog</span></a><a href="/tags/github" rel="tag"><span class="badge text-bg-primary rounded-pill"style="margin-right: 5px">Github</span></a></h3></div></div><script src="/js/bootstrap.bundle.min.js"></script></body></html>
