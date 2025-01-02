@@ -1,0 +1,80 @@
+<!doctype html><html lang="en" data-bs-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="I developed a screen applying SwiftUI + TCA in an existing UIKit project."><meta name="author" content="sookim-1"><meta name="generator" content="Ignite v0.2.1"><title>Number: 036, Date: 2024-09-09 – My T.W.L Site</title><link href="/css/bootstrap.min.css" rel="stylesheet"><link href="/css/bootstrap-icons.min.css" rel="stylesheet"><link href="https://sookim-1.github.io/en_2024/036-20240909_en" rel="canonical"><link href="/images/favicon.png" rel="icon"><meta property="og:site_name" content="sookim-1"><meta property="og:title" content="Number: 036, Date: 2024-09-09"><meta property="twitter:title" content="Number: 036, Date: 2024-09-09"><meta property="og:description" content="Number: 036, Date: 2024-09-09"><meta name="twitter:description" content="Number: 036, Date: 2024-09-09"><meta property="og:url" content="https://sookim-1.github.io/en_2024/036-20240909_en"><meta name="twitter:domain" content="sookim-1.github.io"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:dnt" content="on"></head><body class="container" style="padding-top: 80px; padding-bottom: 80px"><div class="col-sm-10 mx-auto"><h1>Number: 036, Date: 2024-09-09</h1><p><h2>2024.09.03 ~ 2024.09.08</h2><h3>🏬 SwiftUI + TCA (The Composable Architecture)</h3><hr /><p>I developed a screen applying SwiftUI + TCA in an existing UIKit project.</p><p>One major takeaway from using SwiftUI is its many conveniences. The separation of UI components and the reduced number of lines of code compared to UIKit enhance readability. I also noticed that utilizing ChatGPT and the speed of Preview significantly shortened the UI development time.</p><p>When handling API requests with TCA, I initially thought that having multiple Actions (e.g., request, response) might complicate things, but I see it as a measure to maintain unidirectional data flow within the architecture.</p><h3>📷 Text OCR</h3><hr /><p>There are various tools for extracting text from images (Google ML Kit, NHNCloud OCR, Vision).</p><p>Among them, I decided to use the Vision framework, which is provided by Apple, for text extraction.</p><p>There’s a similarly named framework, VisionKit, which can be used together to recognize areas using <code>VNDocumentCameraViewController</code> and extract images for text extraction via the Vision framework.</p><p>However, it seems there isn’t a way to customize the camera scan screen directly with <code>VNDocumentCameraViewController</code>.</p><p>So, I used the AVFoundation framework to capture images and provided them to the Vision framework, but the recognition rate was significantly lower.</p><p>I tested the 🔗 <a href="https://github.com/adorsys/YesWeScan">YesWeScan library</a>, which I used frequently before VisionKit was available, and found that its recognition rate was comparable to that of VisionKit.</p><p>I plan to analyze the library to identify differences in the configuration when using AVFoundation, which I initially set up.</p><h3>🌎 Using YouTube Data API</h3><hr /><p>To track the viewing status of useful YouTube channel videos related to development, I wrote a Python script that organizes playlists into a text file using the YouTube Data API.</p><p>🔗 <a href="https://developers.google.com/youtube/v3/docs/search/list?hl=ko">YouTube API Docs - search</a></p><pre><code class="language-python">import requests
+import time
+
+# Step 1: API settings
+API_KEY = ''  # Enter your actual API key here
+CHANNEL_ID = ''  # Enter the channel ID from which to fetch titles
+
+MAX_RESULTS = 50  # Maximum number of results to retrieve at once (up to 50)
+
+# YouTube Data API v3 search endpoint base URL
+youtube_url = 'https://www.googleapis.com/youtube/v3/search'
+
+# Parameters needed for the API request
+params = {
+    'part': 'snippet',
+    'maxResults': MAX_RESULTS,
+    'channelId': CHANNEL_ID,
+    'type': 'video',
+    'order': 'date',  # Sort results by date
+    'key': API_KEY
+}
+
+# Function to fetch video titles and URLs
+def fetch_video_titles_and_urls():
+    videosResult = []
+    next_page_token = None
+
+    while True:
+        if next_page_token:
+            params['pageToken'] = next_page_token
+
+        # Step 2: Send GET request to YouTube Data API
+        response = requests.get(youtube_url, params=params)
+        data = response.json()
+
+        # Step 3: Extract video titles and URLs
+        for item in data['items']:
+            title = item['snippet']['title']
+            video_id = item['id']['videoId']
+            video_url = f'https://www.youtube.com/watch?v={video_id}'
+            videosResult.append((title, video_url))
+
+        # Check if there is a next page
+        next_page_token = data.get('nextPageToken')
+
+        # Wait for 61 seconds if there is a next page
+        if next_page_token:
+            time.sleep(61)
+
+        if not next_page_token:
+            break
+
+    return videosResult
+
+# Function to save titles and URLs to a text file
+def save_titles_and_urls_to_file(videos, filename='video_titles_and_urls.txt'):
+    with open(filename, 'w', encoding='utf-8') as file:
+        for index, (title, url) in enumerate(videos, start=1):
+            file.write(f"{index}. {title}\n- {url}\n\n")
+
+# Execute the code
+videos = fetch_video_titles_and_urls()
+save_titles_and_urls_to_file(videos)
+
+</code></pre><ul><li>A script that searches for the desired channel ID, fetches the video list, and saves it to the <code>video_titles_and_urls.txt</code> file if there is a next page.</li></ul><h3>🙋🏻‍♂️ Other Notes</h3><hr /><ol><li>When adding to <code>queryItem</code> in <code>URLComponents</code>, it automatically performs UTF-8 URL encoding, so handling it separately may result in double encoding.<pre><code class="language-swift">    func requestSearch(keyword: String) async throws -> Result<SampleDTO, SampleError> {
+				...
+				
+        /* Duplicate
+        guard let encodedKeyword = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            return .failure(.invalidUrl)
+        }
+        */
+
+        // Automatically performs URL encoding when added to the query
+        components?.queryItems = [
+            URLQueryItem(name: "searchKeyword", value: keyword)
+        ]
+        
+        ...
+</code></pre></li></ol></p><div><h3><a href="/tags/i-o-s" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">iOS</span></a><a href="/tags/swift" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Swift</span></a><a href="/tags/swift-u-i" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">SwiftUI</span></a><a href="/tags/t-c-a" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">TCA</span></a><a href="/tags/u-r-l-session" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">URLSession</span></a><a href="/tags/vision" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Vision</span></a><a href="/tags/o-c-r" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">OCR</span></a><a href="/tags/youtube" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Youtube</span></a></h3></div></div><script src="/js/bootstrap.bundle.min.js"></script></body></html>
