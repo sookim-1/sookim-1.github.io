@@ -1,0 +1,67 @@
+<!doctype html><html lang="en" data-bs-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="기존 프로젝트에 신규 API 2개를 추가하는 작업을 진행했다. 해당 작업을 진행하면서 주의할 부분을 2가지 알게되었다."><meta name="author" content="sookim-1"><meta name="generator" content="Ignite v0.2.1"><title>번호 : 003, 작성일자: 2025-01-20 – My T.W.L Site</title><link href="/css/bootstrap.min.css" rel="stylesheet"><link href="/css/bootstrap-icons.min.css" rel="stylesheet"><link href="https://sookim-1.github.io/ko_2025/003-20250120" rel="canonical"><link href="/images/favicon.png" rel="icon"><meta property="og:site_name" content="sookim-1"><meta property="og:title" content="번호 : 003, 작성일자: 2025-01-20"><meta property="twitter:title" content="번호 : 003, 작성일자: 2025-01-20"><meta property="og:description" content="번호 : 003, 작성일자: 2025-01-20"><meta name="twitter:description" content="번호 : 003, 작성일자: 2025-01-20"><meta property="og:url" content="https://sookim-1.github.io/ko_2025/003-20250120"><meta name="twitter:domain" content="sookim-1.github.io"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:dnt" content="on"></head><body class="container" style="padding-top: 80px; padding-bottom: 80px"><div class="col-sm-10 mx-auto"><h1>번호 : 003, 작성일자: 2025-01-20</h1><p><h3>🛜 Query Parameter 배열 주의사항, Task 사용 주의사항</h3><hr /><p>기존 프로젝트에 신규 API 2개를 추가하는 작업을 진행했다. 해당 작업을 진행하면서 주의할 부분을 2가지 알게되었다.</p><blockquote><p>Query Parameter</p></blockquote><p>HTTP Method는 GET이였고 Query Parameter를 전달받는 데 파라미터 중 하나가 배열로 전달받게 되어있었다.</p><p>async & await 문법을 활용하여 API 요청을 설계했는 데 URLQueryItem value에 Swift에서 배열자료형을 그대로 넣었는데 브라켓으로 인해 적합한 응답값이 내려오지 않았다.</p><p>알고보니 서버에서 브라켓을 인식할 수 있다면 상관없지만, 인식하지 못하는 경우 쉼표 구분자로 값을 전달하거나, 같은 키값을 여러번 넣는 방법을 통해 해결할 수 있다.</p><p>Alamofire 라이브러리에서는 변환이 자동으로 되거나 추가적인 인코딩설정을 진행할 수 있다.</p><pre><code class="language-swift">❎
+let nameList = ["철수", "영희"]
+let queryParam = URLQueryItem(name: "nameList", value: nameList)
+
+🅾️
+let nameList = ["철수", "영희"]
+let commaFormatNameList = nameList.joined(separator: ",")
+let queryParam = URLQueryItem(name: "nameList", value: commaFormatNameList)
+
+🅾️
+let nameList = ["철수", "영희"]
+let queryParam = nameList.map { URLQueryItem(name: "nameList", value: $0) }
+</code></pre><p>기본적으로 서버에서는 API명세서에는 Number, Array등 각각 자료형을 명시하지만, 결국에 Query Parameter를 전달받을 때 모두 String으로 응답을 받는다. KakaoSDK에서 [String: Any] 자료형을 [URLQueryItem]으로 변경해주는 extension함수가 있는데 위의 이유로 모두 String으로 변경하는 것을 확인할 수 있다.</p><pre><code class="language-swift">//  Copyright 2019 Kakao Corp.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+extension Dictionary {
+    public var queryParameters: String {
+        var parts: [String] = []
+        for (key, value) in self {
+            let part = String(format: "%@=%@",
+                              // ! optional unwrapping [ ]
+                              String(describing: key).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!,
+                              // ! optional unwrapping [ ]
+                              String(describing: value).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)
+            parts.append(part as String)
+        }
+        return parts.joined(separator: "&")
+    }
+    
+    public var urlQueryItems: [URLQueryItem]? {        
+        let queryItems = self.map { (key, value) in
+            URLQueryItem(name: String(describing: key),
+                         value: String(describing: value))
+        }
+        return queryItems
+    }
+}
+
+</code></pre><blockquote><p>Task</p></blockquote><p>async & await 문법으로 API 작업을 진행하다가 실수한 부분은 Task는 비동기 작업인데 끝나고 진행할 코드를 Task 바깥에 넣어서 정상작동하지 않은 이슈가 있었다.</p><p>당연하지만 Task를 사용할 때 주의해서 사용해야겠다.</p><pre><code class="language-swift">// 정상 동작 : requestMember 호출 -> requestMemberDetail 호출
+
+❎
+// requestMemberDetail 호출 -> requestMember 호출
+Task {
+		let response = await requestMember()
+		print(response)
+}
+
+requestMemberDetail()
+
+🅾️
+// requestMember 호출 -> requestMemberDetail 호출
+Task {
+		let response = await requestMember()
+		print(response)
+		requestMemberDetail()
+}
+</code></pre><h3>🙋🏻‍♂️ 기타 사항</h3><hr /><ol><li><a href="https://www.titanium-software.fr/en/index.html">OnyX</a>라는 OS를 유지관리하고 최적화할 수 있는 오픈소스 프로그램을 알게되었다. 설치하고 사용해보니 한국어로 누가 기여를 했는 지 한국어로 잘 표시되고 청소를 진행할 때는 옵션을 잘 확인하고 지워야겠다. 많은 옵션들이 활성화되어있어 잘못 지워질 수 있을 것 같다.</li></ol></p><div><h3><a href="/tags/i-o-s" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">iOS</span></a><a href="/tags/swift" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Swift</span></a><a href="/tags/mac" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Mac</span></a><a href="/tags/query-parameter" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Query Parameter</span></a><a href="/tags/task" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Task</span></a></h3></div></div><script src="/js/bootstrap.bundle.min.js"></script></body></html>
