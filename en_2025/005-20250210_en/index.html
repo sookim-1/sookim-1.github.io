@@ -1,0 +1,75 @@
+<!doctype html><html lang="en" data-bs-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="I compiled a list of collaboration-related terms that were new to me."><meta name="author" content="sookim-1"><meta name="generator" content="Ignite v0.2.1"><title>Number: 005, Date: 2025-02-10 – My T.W.L Site</title><link href="/css/bootstrap.min.css" rel="stylesheet"><link href="/css/bootstrap-icons.min.css" rel="stylesheet"><link href="https://sookim-1.github.io/en_2025/005-20250210_en" rel="canonical"><link href="/images/favicon.png" rel="icon"><meta property="og:site_name" content="sookim-1"><meta property="og:title" content="Number: 005, Date: 2025-02-10"><meta property="twitter:title" content="Number: 005, Date: 2025-02-10"><meta property="og:description" content="Number: 005, Date: 2025-02-10"><meta name="twitter:description" content="Number: 005, Date: 2025-02-10"><meta property="og:url" content="https://sookim-1.github.io/en_2025/005-20250210_en"><meta name="twitter:domain" content="sookim-1.github.io"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:dnt" content="on"></head><body class="container" style="padding-top: 80px; padding-bottom: 80px"><div class="col-sm-10 mx-auto"><h1>Number: 005, Date: 2025-02-10</h1><p><h2>2025.02.03 ~ 2025.02.09</h2><h3>🤝 Collaboration-Related Terms</h3><hr /><p>I compiled a list of collaboration-related terms that were new to me.</p><blockquote><p>Possession Authentication vs. Identity Authentication</p></blockquote><ul><li><strong>Identity Authentication</strong>: A process that verifies a person based on personal information.<ul><li>e.g., Mobile phone authentication, digital certificates, etc.</li></ul></li><li><strong>Possession Authentication</strong>: A process that verifies ownership of a specific device or information.<ul><li>e.g., SMS verification, email verification, OTP, etc.</li></ul></li></ul><p><a href="https://brunch.co.kr/@jintokki/18">Source - The Characteristics and Differences of Identity Authentication and Possession Authentication</a></p><blockquote><p>ICE Scoring</p></blockquote><p>A decision-making framework known for being fast and effective.</p><p>ICE (Impact, Confidence, Ease)</p><ul><li><strong>Impact</strong>: The influence on business.</li><li><strong>Confidence</strong>: The level of certainty regarding success.</li><li><strong>Ease</strong>: The amount of resources required.</li></ul><p><a href="https://brunch.co.kr/@aboutaudience/11">Source - Super Fast Decision Making - ICE Scoring</a></p><h3>🌏 Design Pattern In Swift</h3><hr /><p>There is an open-source project called <a href="https://github.com/ochococo/Design-Patterns-In-Swift">Design-Patterns-In-Swift</a>, which explains design patterns using the Swift language.</p><blockquote><p>Chain of Responsibility Pattern Example</p></blockquote><pre><code class="language-swift">protocol Withdrawing {
+    func withdraw(amount: Int) -> Bool
+}
+
+final class MoneyPile: Withdrawing {
+
+    let value: Int
+    var quantity: Int
+    var next: Withdrawing?
+
+    init(value: Int, quantity: Int, next: Withdrawing?) {
+        self.value = value
+        self.quantity = quantity
+        self.next = next
+    }
+
+    func withdraw(amount: Int) -> Bool {
+
+        var amount = amount
+
+        func canTakeSomeBill(want: Int) -> Bool {
+            return (want / self.value) > 0
+        }
+
+        var quantity = self.quantity
+
+        while canTakeSomeBill(want: amount) {
+
+            if quantity == 0 {
+                break
+            }
+
+            amount -= self.value
+            quantity -= 1
+        }
+
+        guard amount > 0 else {
+            return true
+        }
+
+        if let next {
+            return next.withdraw(amount: amount)
+        }
+
+        return false
+    }
+}
+
+final class ATM: Withdrawing {
+
+    private var hundred: Withdrawing
+    private var fifty: Withdrawing
+    private var twenty: Withdrawing
+    private var ten: Withdrawing
+
+    private var startPile: Withdrawing {
+        return self.hundred
+    }
+
+    init(hundred: Withdrawing,
+           fifty: Withdrawing,
+          twenty: Withdrawing,
+             ten: Withdrawing) {
+
+        self.hundred = hundred
+        self.fifty = fifty
+        self.twenty = twenty
+        self.ten = ten
+    }
+
+    func withdraw(amount: Int) -> Bool {
+        return startPile.withdraw(amount: amount)
+    }
+}
+</code></pre><p>I revisited design patterns after a long time and found that the Chain of Responsibility example, specifically the ATM object, lacked extensibility. To improve it, I modified the properties to be received as an array.</p><p>After this change, the ATM object became much more scalable. Although the ATM object itself is not directly related to the Chain of Responsibility pattern’s purpose, one of the pattern’s strengths is extensibility. I believed it would be beneficial if the objects using it were also extensible, so I contributed the modification.</p><ul><li><a href="https://github.com/ochococo/Design-Patterns-In-Swift/pull/131">PR - Improve ATM extensibility by replacing fixed properties with a dynamic list</a></li></ul><p>Additionally, I had previously contributed to the Prototype Pattern example, but my email had changed. I explored ways to modify the commit history in the open-source project, trying <strong>git rebase, git-filter-repo, cherry-pick, and format-path</strong>.</p><p>However:</p><ul><li><strong>git rebase</strong> and <strong>git-filter-repo</strong> affected past commits, making them unsuitable for open-source contributions.</li><li><strong>cherry-pick</strong> and <strong>format-path</strong> resulted in many conflict files.</li></ul><p>Although I tried multiple approaches out of curiosity, I concluded that it’s best not to modify past contributions in open-source projects.</p><h3>🙋🏻‍♂️ Other Notes</h3><hr /><ol><li>I read an interesting article about the failure of a code assistant service called Kite.<ul><li><a href="https://www.kite.com/blog/product/kite-is-saying-farewell/">Kite Service Failure Retrospective</a></li></ul></li><li>If you encounter an <strong>LLDB RPC Server Crash Playground</strong> error in Xcode 16, check whether the Swift version is set to 6.</li><li>I created a GitHub repository while watching the <a href="https://www.youtube.com/Kavsoft">KavSoft</a> SwiftUI tutorial channel and completed lessons 21 to 28.</li><li>Useful Android tips:<ol><li>If an app forcibly increases the volume, enabling <strong>Do Not Disturb mode</strong> prevents sound from playing.</li><li>In Android Studio, pressing <strong>Cmd + Shift + F</strong> allows you to search the entire project.</li></ol></li><li>A runtime error occurred in a production app, and I identified the issue using <strong>Elastic Search</strong> logs, which helped trace the error path and resolve it.</li><li>I am developing a <strong>Flutter</strong> project that includes user registration and login using REST API communication.</li></ol></p><div><h3><a href="/tags/i-o-s" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">iOS</span></a><a href="/tags/swift" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Swift</span></a><a href="/tags/open-source" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">OpenSource</span></a><a href="/tags/swift-u-i" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">SwiftUI</span></a><a href="/tags/flutter" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Flutter</span></a><a href="/tags/android" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Android</span></a><a href="/tags/playground" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Playground</span></a><a href="/tags/retrospective" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Retrospective</span></a><a href="/tags/elastic-search" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Elastic Search</span></a><a href="/tags/collaboration" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Collaboration</span></a></h3></div></div><script src="/js/bootstrap.bundle.min.js"></script></body></html>
