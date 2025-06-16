@@ -1,0 +1,63 @@
+<!doctype html><html lang="en" data-bs-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="When making networking requests that don’t need to be executed sequentially, making them in parallel can reduce the overall time. Previously, we used DispatchGroup, adding tasks with enter, and signaling completion with leave, then handling everything in notify once all were complete."><meta name="author" content="sookim-1"><meta name="generator" content="Ignite v0.2.1"><title>Number: 021, Date Written: 2025-06-16 – My T.W.L Site</title><link href="/css/bootstrap.min.css" rel="stylesheet"><link href="/css/bootstrap-icons.min.css" rel="stylesheet"><link href="https://sookim-1.github.io/en_2025/021-20250616_en" rel="canonical"><link href="/images/favicon.png" rel="icon"><meta property="og:site_name" content="sookim-1"><meta property="og:title" content="Number: 021, Date Written: 2025-06-16"><meta property="twitter:title" content="Number: 021, Date Written: 2025-06-16"><meta property="og:description" content="Number: 021, Date Written: 2025-06-16"><meta name="twitter:description" content="Number: 021, Date Written: 2025-06-16"><meta property="og:url" content="https://sookim-1.github.io/en_2025/021-20250616_en"><meta name="twitter:domain" content="sookim-1.github.io"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:dnt" content="on"></head><body class="container" style="padding-top: 80px; padding-bottom: 80px"><div class="col-sm-10 mx-auto"><h1>Number: 021, Date Written: 2025-06-16</h1><p><h2>2025.06.09 ~ 2025.06.15</h2><h3>⚡️ Swift Concurrency Parallel Programming Comparison</h3><hr /><p>When making networking requests that don’t need to be executed sequentially, making them in parallel can reduce the overall time. Previously, we used <code>DispatchGroup</code>, adding tasks with <code>enter</code>, and signaling completion with <code>leave</code>, then handling everything in <code>notify</code> once all were complete.</p><p><strong>DispatchGroup Parallel Code</strong></p><pre><code class="language-swift">func requestLegacyParallel() {
+    let group = DispatchGroup()
+    var results = [Bool]()
+    let startTime = Date()
+    print("Start (DispatchGroup)")
+
+    for _ in 0..<3 {
+        group.enter()
+        Task {
+            let result = await self.networking()
+            results.append(result)
+            group.leave()
+        }
+    }
+
+    group.notify(queue: .main) {
+        let endTime = Date()
+        let duration = endTime.timeIntervalSince(startTime)
+        print("End (DispatchGroup): Duration \(duration) seconds")
+        print("Results: \(results)")
+    }
+}
+</code></pre><p><strong>Swift Concurrency Sequential Code Example</strong></p><pre><code class="language-swift">func requestConcurrency() {
+    Task {
+        let startTime = Date()
+        print("Start (Sequential)")
+
+        let a1 = await self.networking()
+        let a2 = await self.networking()
+        let a3 = await self.networking()
+
+        let result = [a1, a2, a3]
+        let endTime = Date()
+        let duration = endTime.timeIntervalSince(startTime)
+        print("End: Duration \(duration) seconds")
+        print("Results: \(results)")
+    }
+}
+</code></pre><p><strong>Swift Concurrency Parallel Code Example</strong></p><pre><code class="language-swift">func requestConcurrencyParallel() {
+    Task {
+        let startTime = Date()
+        print("Start (Parallel)")
+
+        async let a1 = self.networking()
+        async let a2 = self.networking()
+        async let a3 = self.networking()
+
+        let results = await (a1, a2, a3)
+
+        let endTime = Date()
+        let duration = endTime.timeIntervalSince(startTime)
+        print("End (Parallel): Duration \(duration) seconds")
+        print("Results: \(results)")
+    }
+}
+</code></pre><p>When comparing the elapsed time, both the DispatchGroup and <code>async let</code> approaches naturally result in faster execution compared to sequential requests. Since Apple recommends using Concurrency, we should use <code>async let</code> for parallel execution.</p><h3>📃 SQL Query Syntax</h3><hr /><p>I spent some time reviewing SQL query syntax.</p><p>There were some confusing parts regarding aggregate functions in the SELECT statement, but understanding that multiple datasets are merged into a single dataset helped clarify the concept.</p><p>Even if you combine multiple tables, the result is always a single table.</p><p>Keywords: SELECT, FROM, WHERE, GROUP BY, ORDER BY, HAVING, JOIN ~ ON, LEFT JOIN ~ ON, Count(), AVG(), MIN(), MAX()</p><h3>📝 Obsidian</h3><hr /><p>Obsidian is an app used to write and manage notes using markdown syntax. Initially, I thought I could only use it locally or with a paid sync option, but after doing some research, I found that remote sync can be set up for free using various cloud services like GitHub, Dropbox, and Google Drive.</p><p>First, I completely removed my previous Obsidian setup.</p><p><strong>How to Completely Remove It</strong></p><pre><code class="language-bash"># Search the entire system starting from root
+# -iname "*obsidian*" searches for files/folders containing "obsidian", case-insensitive
+# 2>/dev/null suppresses permission error messages
+$ sudo find / -iname "*obsidian*" 2>/dev/null
+
+# -iname "obs*" searches for names starting with "obs", case-insensitive
+$ sudo find / -iname "*obs*" 2>/dev/null
+</code></pre><p>I then integrated GitHub using the Git plugin, and Dropbox using the Remotely Save plugin.</p><p>Although the paid Obsidian Sync is more stable and setting up plugins each time is a bit of a hassle, I’ll reconsider the paid option once I become more familiar with Obsidian.</p><p>On a side note, I noticed that the cache size on my Mac seemed to be increasing, so I plan to look into that further.</p><h3>🙋🏻‍♂️ Other Notes</h3><hr /><ol><li>At WWDC 2025, Apple introduced Liquid Glass support starting with iOS 26. They also released an app called IconComposer, which makes it easier to create app icons. I gave it a try.</li><li>I’m planning to develop an image loader that supports E-Tag, which can be applied to image URLs and web URLs.</li><li>I tried running an AI video generation tool called FramePack on my M1 Max. RAM is important, but GPU performance also matters a lot. Since generating results took a long time, I looked into alternatives and found that using Hugging Face Spaces to run it remotely is also a good option.</li></ol></p><div><h3><a href="/tags/i-o-s" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">iOS</span></a><a href="/tags/swift" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Swift</span></a><a href="/tags/concurrency" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Concurrency</span></a><a href="/tags/obsidian" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Obsidian</span></a><a href="/tags/icon-composer" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">Icon Composer</span></a><a href="/tags/e-tag" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">E-Tag</span></a><a href="/tags/a-i" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">AI</span></a><a href="/tags/s-q-l" rel="tag"><span class="badge text-bg-primary rounded-pill" style="margin-right: 5px">SQL</span></a></h3></div></div><script src="/js/bootstrap.bundle.min.js"></script></body></html>
